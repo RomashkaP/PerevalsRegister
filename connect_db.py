@@ -15,8 +15,10 @@ try:
     ) as conn:
         with conn.cursor() as cur:
             print('✅ Успешное подключение к PostgreSQL!')
-            cur.execute('SELECT version();')
-            version = cur.fetchone()
-            print("Версия PostgreSQL:", version[0])
+            cur.execute("INSERT INTO pereval_areas (region, title) VALUES ( %s, %s) RETURNING id;",
+                        (1, "Кату-Ярык")
+            )
+            area_id = cur.fetchone()
+            print("ID созданного района:", area_id[0])
 except Exception as e:
     print('Connect error - ', e)
