@@ -7,11 +7,11 @@ load_dotenv()
 
 try:
     with psycopg.connect(
-        dbname=os.getenv('DB_NAME'),
-        user=os.getenv('DB_USER'),
-        password=os.getenv('DB_PASS'),
-        host=os.getenv('DB_HOST'),
-        port=os.getenv('DB_PORT')
+        dbname=os.getenv('FSTR_DB_NAME'),
+        user=os.getenv('FSTR_DB_LOGIN'),
+        password=os.getenv('FSTR_DB_PASS'),
+        host=os.getenv('FSTR_DB_HOST'),
+        port=os.getenv('FSTR_DB_PORT')
     ) as conn:
         with conn.cursor() as cur:
             print('✅ Успешное подключение к PostgreSQL!')
