@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 import psycopg
 
+
 load_dotenv()
 
 class WorkingWithDataClass():
@@ -16,29 +17,30 @@ class WorkingWithDataClass():
             host=os.getenv('FSTR_DB_HOST'),
             port=os.getenv('FSTR_DB_PORT')
         )
+    # ------- Закомментировал эту часть, т.к. в FAQ написано, что авторизация пользователя не нужна.
+    #-------- Удалять пока не буду, вдруго понадобиться в следующих спринтах.
+    # def create_user( # Метод для создания пользователя.
+    #         self,
+    #         surname: str,
+    #         name: str,
+    #         patronymic: str = None,
+    #         email: str = None,
+    #         phone_num: str = None,
+    # ) -> int: # Требуется хотя бы email или phone_num. Возвращает id нового пользователя.
+    #     if not email and not phone_num:
+    #         raise ValueError('Должен быть указан email или номер телефона.')
+    #     with self.get_connection() as conn:
+    #         with conn.cursor() as cur:
+    #             cur.execute(
+    #                 "INSERT INTO users (email, phone_num, surname, name, patronymic)"
+    #                 "VALUES (%s, %s, %s, %s, %s)"
+    #                 "RETURNING id;",
+    #                 (email, phone_num, surname, name, patronymic)
+    #             )
+    #             user_id = cur.fetchone()[0]
+    #             return user_id
 
-    def create_user( # Метод для создания пользователя.
-            self,
-            surname: str,
-            name: str,
-            patronymic: str = None,
-            email: str = None,
-            phone_num: str = None,
-    ) -> int: # Требуется хотя бы email или phone_num. Возвращает id нового пользователя.
-        if not email and not phone_num:
-            raise ValueError('Должен быть указан email или номер телефона.')
-        with self.get_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    "INSERT INTO users (email, phone_num, surname, name, patronymic)"
-                    "VALUES (%s, %s, %s, %s, %s)"
-                    "RETURNING id;",
-                    (email, phone_num, surname, name, patronymic)
-                )
-                user_id = cur.fetchone()[0]
-                return user_id
-
-    def submitData( # Метод  для создания перевала.
+    def submit_pereval( # Метод  для создания перевала.
             self,
             pereval_area_id: int,
             user_id: int,
