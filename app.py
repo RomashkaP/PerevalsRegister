@@ -23,7 +23,13 @@ def post_pereval(data: PerevalPost):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-
+@app.get('/submitData/{pereval_id}')
+def get_pereval(pereval_id: int):
+    db = WorkingWithDataClass()
+    data = db.get_pereval(pereval_id)
+    if not data:
+        raise HTTPException(status_code=404, detail='Перевал не найден.')
+    return PerevalGet(**data)
 
 
 

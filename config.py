@@ -136,10 +136,10 @@ class WorkingWithDataClass():
                     JOIN regions r ON p_ar.region = r.id
                     JOIN users u ON p.user = u.id
                     JOIN coords c ON p.coords = c.id
-                    JOIN activity_types a_t ON p.activity_type = a_t.id
+                    JOIN activities_types a_t ON p.activity_type = a_t.id
                     WHERE p.id = %s;
                     """,
-                    (pereval_id)
+                    (pereval_id, )
                 )
                 row = cur.fetchone()
                 if not row:
