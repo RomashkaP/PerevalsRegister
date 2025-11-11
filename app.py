@@ -1,38 +1,13 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List, Optional
 from config import WorkingWithDataClass
+from models import *
 
-
-# Схема данных
-class Coord(BaseModel):
-    latitude: float
-    longitude: float
-    height: int
-
-class Image(BaseModel):
-    image: str
-
-class Pereval(BaseModel):
-    pereval_area: int
-    beauty_title: Optional[str] = None
-    title: str
-    other_titles: Optional[str] = None
-    connects: str
-    user: int
-    coords: Coord
-    winter: Optional[str] = None
-    spring: Optional[str] = None
-    summer: Optional[str] = None
-    autumn: Optional[str] = None
-    activity_type: int
-    images: List[Image] = []
 
 # API
 app = FastAPI(title='Pereval API', version='1.0')
 
 @app.post('/submitData/')
-def submit_data(data: Pereval):
+def post_pereval(data: PerevalPost):
     db = WorkingWithDataClass()
     try:
         pereval_id = db.submit_pereval(
@@ -47,6 +22,7 @@ def submit_data(data: Pereval):
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
 
 
 
