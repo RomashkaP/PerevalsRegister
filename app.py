@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from config import WorkingWithDataClass
+from typing import List
 from models import *
 
 
@@ -48,6 +49,16 @@ def patch_pereval(pereval_id: int, data: PerevalPost):
     except Exception as e:
         return {'state': 0, 'message': str(e)}
 
+@app.get('/submitData/', response_model=List[PerevalGet])
+def get_perevals_user_email(user__email: str = Query(..., alias='user__email')):
+    db = WorkingWithDataClass()
+    try:
+        perevals = db.get_perevals_user_email(user__email)
+        if not perevals:
+            return []
+        return [PerevalGet(**p) for p in perevals]
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 

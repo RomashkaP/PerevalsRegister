@@ -266,9 +266,16 @@ class WorkingWithDataClass():
                         )
                 return True
 
-    def get_pereval_user_email(self, user_id):
+    def get_perevals_user_email(self, user_email: str):
         with self.get_connection() as conn:
             with conn.cursor() as cur:
+
+                cur.execute("SELECT id FROM users WHERE email = %s", (user_email,))
+                user_row = cur.fetchone()
+                if not user_row:
+                    return []
+                user_id = user_row[0]
+
                 cur.execute(
                     """
                     SELECT
@@ -289,12 +296,13 @@ class WorkingWithDataClass():
                     """,
                     (user_id,)
                 )
-                all_perevals_user = cur.fetchall()
-                if not all_perevals_user:
+                all_perevals = cur.fetchall()
+                if not all_perevals:
                     return None
+
                 result_list = []
 
-                for pereval in all_perevals_user:
+                for pereval in all_perevals:
                     (
                         p_id, p_beauty_title, p_title, p_other_titles, p_connects, p_add_time, p_status,
                         p_winter, p_spring, p_summer, p_autumn,
@@ -304,6 +312,9 @@ class WorkingWithDataClass():
                         c_id, c_latitude, c_longitude, c_height,
                         a_t_id, a_t_title
                     ) = pereval
+
+                    cur.execute("SELECT id, image FROM images WHERE pereval = %s", (p_id,))
+                    images = [{"id": img[0], "image": img[1]} for img in cur.fetchall()]
 
                     data_dict = {
                         'id': p_id,
