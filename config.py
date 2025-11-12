@@ -266,8 +266,87 @@ class WorkingWithDataClass():
                         )
                 return True
 
+    def get_pereval_user_email(self, user_id):
+        with self.get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT
+                        p.id, p.beauty_title, p.title, p.other_titles, p.connects, p.add_time, p.status,
+                        p.winter, p.spring, p.summer, p.autumn, 
+                        p_ar.id, p_ar.title, 
+                        r.id, r.title,
+                        u.id, u.email, u.phone_num, u.surname, u.name, u.patronymic,
+                        c.id, c.latitude, c.longitude, c.height,
+                        a_t.id, a_t.title    
+                    FROM perevals p
+                    JOIN pereval_areas p_ar ON p.pereval_area = p_ar.id
+                    JOIN regions r ON p_ar.region = r.id
+                    JOIN users u ON p.user = u.id
+                    JOIN coords c ON p.coords = c.id
+                    JOIN activities_types a_t ON p.activity_type = a_t.id
+                    WHERE u.id = %s;
+                    """,
+                    (user_id,)
+                )
+                all_perevals_user = cur.fetchall()
+                if not all_perevals_user:
+                    return None
+                result_list = []
 
+                for pereval in all_perevals_user:
+                    (
+                        p_id, p_beauty_title, p_title, p_other_titles, p_connects, p_add_time, p_status,
+                        p_winter, p_spring, p_summer, p_autumn,
+                        p_ar_id, p_ar_title,
+                        r_id, r_title,
+                        u_id, u_email, u_phone_num, u_surname, u_name, u_patronymic,
+                        c_id, c_latitude, c_longitude, c_height,
+                        a_t_id, a_t_title
+                    ) = pereval
 
+                    data_dict = {
+                        'id': p_id,
+                        'pereval_area': {
+                            'id': p_ar_id,
+                            'region': {
+                                'id': r_id,
+                                'title': r_title
+                            },
+                            'title': p_ar_title
+                        },
+                        'beauty_title': p_beauty_title,
+                        'title': p_title,
+                        'other_titles': p_other_titles,
+                        'connects': p_connects,
+                        'add_time': p_add_time.isoformat() if p_add_time else None,
+                        'user': {
+                            'id': u_id,
+                            'email': u_email,
+                            'phone_num': u_phone_num,
+                            'surname': u_surname,
+                            'name': u_name,
+                            'patronymic': u_patronymic
+                        },
+                        'coords': {
+                            'id': c_id,
+                            'latitude': c_latitude,
+                            'longitude': c_longitude,
+                            'height': c_height
+                        },
+                        'winter': p_winter,
+                        'spring': p_spring,
+                        'summer': p_summer,
+                        'autumn': p_autumn,
+                        'activity_type': {
+                            'id': a_t_id,
+                            'title': a_t_title
+                        },
+                        'status': p_status,
+                        'images': images
+                    }
+                    result_list.append(data_dict)
+                return result_list
 
 
 
