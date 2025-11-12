@@ -10,7 +10,7 @@ app = FastAPI(title='Pereval API', version='1.0')
 def post_pereval(data: PerevalPost):
     db = WorkingWithDataClass()
     try:
-        pereval_id = db.submit_pereval(
+        pereval_id = db.post_pereval(
             pereval_area_id=data.pereval_area,
             user_id=data.user,
             coords=data.coords.dict(),
@@ -30,6 +30,23 @@ def get_pereval(pereval_id: int):
     if not data:
         raise HTTPException(status_code=404, detail='Перевал не найден.')
     return PerevalGet(**data)
+
+@app.patch('/submitData/{pereval_id}')
+def patch_pereval(pereval_id: int, data: PerevalPost):
+    db = WorkingWithDataClass()
+    try:
+        result = db.patch_pereval(
+            pereval_id=pereval_id,
+            coords=data.coords.dict(),
+            pereval_data=data.dict(exclude={'coords', 'user', 'images'}),
+            images=[img.dict() for img in data.images]
+        )
+        if result:
+            return {'state': 1, 'message': 'Запись успешно отредактирована.'}
+        else:
+            {"state": 0, "message": "Не удалось обновить запись (статус не 'new' или запись не найдена)"}
+    except Exception as e:
+        return {'state': 0, 'message': str(e)}
 
 
 

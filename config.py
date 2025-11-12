@@ -40,7 +40,7 @@ class WorkingWithDataClass():
     #             user_id = cur.fetchone()[0]
     #             return user_id
 
-    def submit_pereval( # Метод  для создания перевала.
+    def post_pereval( # Метод  для создания перевала.
             self,
             pereval_area_id: int,
             user_id: int,
@@ -202,9 +202,69 @@ class WorkingWithDataClass():
                     'images': images
                 }
 
+    def patch_pereval(
+        self,
+        pereval_id: int,
+        coords: dict,
+        pereval_data: dict,
+        images: list = None
+    ):
+        with self.get_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT status FROM perevals WHERE id = %s;",
+                    (pereval_id,)
+                )
+                result = cur.fetchone()
 
+                if not result:
+                    return False
+                if result[0] != 'new':
+                    return False
 
+                cur.execute(
+                    """
+                    UPDATE coords
+                    SET 
+                        latitude = COALESCE(%s, latitude), 
+                        longitude = COALESCE(%s, longitude),  
+                        height = COALESCE(%s, height)
+                    WHERE id = (SELECT coords FROM perevals WHERE id = %s);
+                    """,
+                    (coords['latitude'], coords['longitude'], coords['height'], pereval_id)
+                )
 
+                cur.execute(
+                    """
+                    UPDATE perevals
+                    SET
+                        pereval_area = COALESCE(%(pereval_area)s, pereval_area),
+                        beauty_title = COALESCE(%(beauty_title)s, beauty_title),
+                        title = COALESCE(%(title)s, title),
+                        other_titles = COALESCE(%(other_titles)s, other_titles),
+                        connects = COALESCE(%(connects)s, connects),
+                        winter = COALESCE(%(winter)s, winter),
+                        spring = COALESCE(%(spring)s, spring),
+                        summer = COALESCE(%(summer)s, summer),
+                        autumn = COALESCE(%(autumn)s, autumn),
+                        activity_type = COALESCE(%(activity_type)s, activity_type)
+                    WHERE id = %(pereval_id)s;
+                    """,
+                    (
+                        {**pereval_data, 'pereval_id': pereval_id}
+                    )
+                )
+
+                if images:
+                    cur.execute(
+                        "DELETE FROM images WHERE pereval = %s", (pereval_id)
+                    )
+                    for img in images:
+                        cur.execute(
+                            "INSERT INTO images (pereval, image) VALUES (%s, %s)",
+                            (pereval_id, img['image'])
+                        )
+                return True
 
 
 
