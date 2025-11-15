@@ -14,7 +14,6 @@ class Image(BaseModel):
     image: str
 
 class PerevalPost(BaseModel):
-    id: int
     pereval_area: int
     beauty_title: Optional[str] = None
     title: str
