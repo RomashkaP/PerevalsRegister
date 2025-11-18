@@ -150,7 +150,7 @@ class DatabaseClass:
                 with conn.cursor() as cur:
                     cur.execute(
                         """
-                        SELECT * FROM perevals;
+                        
                         """
                     )
                     items = cur.fetchall()
